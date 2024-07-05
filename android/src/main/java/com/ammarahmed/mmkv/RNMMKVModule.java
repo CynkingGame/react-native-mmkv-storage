@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.JavaScriptContextHolder;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -42,6 +43,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     private native void nativeInstall(long jsi, String rootPath);
 
     private native void destroy();
+    private native void loadLib();
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -72,6 +74,15 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
             return false;
         }
 
+    }
+
+    @ReactMethod
+    public void loadLibary(Promise promise) {
+        try {
+            this.loadLib();
+        } catch (Exception e) {
+            promise.reject("Error", e);
+        }
     }
 
     @Override

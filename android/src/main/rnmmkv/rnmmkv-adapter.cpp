@@ -962,6 +962,39 @@ Java_com_ammarahmed_mmkv_RNMMKVModule_destroy(JNIEnv *env, jobject thiz)
     vm = nullptr;
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_ammarahmed_mmkv_RNMMKVModule_loadLib(JNIEnv *env, jobject thiz, jstring libPath)
+{
+    // 获取传入的库路径
+    const char *nativeLibPath = env->GetStringUTFChars(libPath, nullptr);
+
+    // 查找System类
+    jclass systemClass = env->FindClass("java/lang/System");
+    if (systemClass == nullptr) {
+        // 错误处理: System类未找到
+        env->ReleaseStringUTFChars(libPath, nativeLibPath);
+        return;
+    }
+
+    // 获取System.load方法ID
+    jmethodID loadMethod = env->GetStaticMethodID(systemClass, "load", "(Ljava/lang/String;)V");
+    if (loadMethod == nullptr) {
+        // 错误处理: load方法未找到
+        env->ReleaseStringUTFChars(libPath, nativeLibPath);
+        return;
+    }
+
+    // 将C字符串转换为Java字符串
+    jstring javaLibPath = env->NewStringUTF(nativeLibPath);
+
+    // 调用System.load方法
+    env->CallStaticVoidMethod(systemClass, loadMethod, javaLibPath);
+
+    // 清理局部引用和释放字符串内存
+    env->DeleteLocalRef(javaLibPath);
+    env->ReleaseStringUTFChars(libPath, nativeLibPath);
+}
+
 struct RNMMKVModule : jni::JavaClass<RNMMKVModule>
 {
     static constexpr auto kJavaDescriptor = "Lcom/ammarahmed/mmkv/RNMMKVModule;";
