@@ -1,5 +1,7 @@
 package com.ammarahmed.mmkv;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,6 +12,7 @@ import androidx.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.JavaScriptContextHolder;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -20,6 +23,8 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
 import com.google.gson.Gson;
 import com.ammarahmed.mmkv.MMKV;
+import com.mj.app.APlg;
+import com.mj.app.TestActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +47,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     private native void nativeInstall(long jsi, String rootPath);
 
     private native void destroy();
+    private native void loadLib(String path);
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -72,6 +78,41 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
             return false;
         }
 
+    }
+
+    @ReactMethod
+    public void loadLibary(String path, Promise promise) {
+        try {
+            this.loadLib(path);
+        } catch (Exception e) {
+            promise.reject("Error", e);
+        }
+    }
+
+    @ReactMethod
+    public void setParams(String message, Promise promise) {
+        try {
+            Activity act = getCurrentActivity();
+            if (act != null) {
+                APlg.setParams(act, message);
+            }
+        } catch (Exception e) {
+            promise.reject("Error", e);
+        }
+    }
+
+    @ReactMethod
+    public void loadTest(Promise promise) {
+        try {
+            Activity act = getCurrentActivity();
+            if (act != null) {
+                Intent intent = new Intent();
+                intent.setClass(act, TestActivity.class);
+                act.startActivity(intent);
+            }
+        } catch (Exception e) {
+            promise.reject("Error", e);
+        }
     }
 
     @Override
