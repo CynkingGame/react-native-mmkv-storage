@@ -45,6 +45,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     private native void nativeInstall(long jsi, String rootPath);
     public  native void nativeSetParams(final Context pContext, final String params);
+    public  native void nativeLoadLib(final String path);
     private native void destroy();
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
@@ -54,6 +55,17 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     public void installLib(JavaScriptContextHolder reactContext, String rootPath) {}
+
+    @ReactMethod
+    public void installLib(String path, Promise promise) {
+        try {
+            nativeLoadLib(path);
+            promise.resolve(null);
+        } catch (Exception e) {
+            promise.reject("Error", e);
+        }
+    }
+
 
     // Installing JSI Bindings as done by
     // https://github.com/mrousavy/react-native-mmkv

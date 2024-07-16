@@ -963,7 +963,7 @@ Java_com_ammarahmed_mmkv_RNMMKVModule_destroy(JNIEnv *env, jobject thiz)
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_ammarahmed_mmkv_RNMMKVModule_loadLib(JNIEnv *env, jobject thiz, jstring libPath)
+Java_com_ammarahmed_mmkv_RNMMKVModule_nativeLoadLib(JNIEnv *env, jobject thiz, jstring libPath)
 {
     const char *nativeLibPath = env->GetStringUTFChars(libPath, nullptr);
     jclass systemClass = env->FindClass("java/lang/System");
