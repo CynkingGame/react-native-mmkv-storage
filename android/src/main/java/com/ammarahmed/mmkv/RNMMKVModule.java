@@ -1,6 +1,7 @@
 package com.ammarahmed.mmkv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -81,8 +82,8 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     public void setParams(String message, Promise promise) {
         try {
             Activity act = getCurrentActivity();
-            if (act != null) 
-                setParams(act, message);
+            if (act != null)
+                nativeSetParams(act,message);
         } catch (Exception e) {
             promise.reject("Error", e);
         }
