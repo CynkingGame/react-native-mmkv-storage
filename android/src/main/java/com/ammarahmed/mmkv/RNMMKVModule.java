@@ -23,8 +23,6 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
 import com.google.gson.Gson;
 import com.ammarahmed.mmkv.MMKV;
-import com.mj.app.APlg;
-import com.mj.app.TestActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,9 +43,8 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     private native void nativeInstall(long jsi, String rootPath);
-
+    public  native void nativeSetParams(final Context pContext, final String params);
     private native void destroy();
-    private native void loadLib(String path);
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -81,35 +78,11 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void loadLibary(String path, Promise promise) {
-        try {
-            this.loadLib(path);
-        } catch (Exception e) {
-            promise.reject("Error", e);
-        }
-    }
-
-    @ReactMethod
     public void setParams(String message, Promise promise) {
         try {
             Activity act = getCurrentActivity();
-            if (act != null) {
-                APlg.setParams(act, message);
-            }
-        } catch (Exception e) {
-            promise.reject("Error", e);
-        }
-    }
-
-    @ReactMethod
-    public void loadTest(Promise promise) {
-        try {
-            Activity act = getCurrentActivity();
-            if (act != null) {
-                Intent intent = new Intent();
-                intent.setClass(act, TestActivity.class);
-                act.startActivity(intent);
-            }
+            if (act != null) 
+                setParams(act, message);
         } catch (Exception e) {
             promise.reject("Error", e);
         }

