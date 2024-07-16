@@ -44,8 +44,8 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     private native void nativeInstall(long jsi, String rootPath);
+    private native void nativeLoad(final String path);
     private native void nativeSetParams(final Context pContext, final String params);
-    private native void nativeLoadLib(final String path);
     private native void destroy();
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
@@ -59,7 +59,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void installLib(String path, Promise promise) {
         try {
-            nativeLoadLib(path);
+            nativeLoad(path);
             promise.resolve(null);
         } catch (Exception e) {
             promise.reject("Error", e);

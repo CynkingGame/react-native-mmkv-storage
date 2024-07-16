@@ -962,26 +962,6 @@ Java_com_ammarahmed_mmkv_RNMMKVModule_destroy(JNIEnv *env, jobject thiz)
     vm = nullptr;
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_ammarahmed_mmkv_RNMMKVModule_nativeLoadLib(JNIEnv *env, jobject thiz, jstring libPath)
-{
-    const char *nativeLibPath = env->GetStringUTFChars(libPath, nullptr);
-    jclass systemClass = env->FindClass("java/lang/System");
-    if (systemClass == nullptr) {
-        env->ReleaseStringUTFChars(libPath, nativeLibPath);
-        return;
-    }
-    jmethodID loadMethod = env->GetStaticMethodID(systemClass, "load", "(Ljava/lang/String;)V");
-    if (loadMethod == nullptr) {
-        env->ReleaseStringUTFChars(libPath, nativeLibPath);
-        return;
-    }
-    jstring javaLibPath = env->NewStringUTF(nativeLibPath);
-    env->CallStaticVoidMethod(systemClass, loadMethod, javaLibPath);
-    env->DeleteLocalRef(javaLibPath);
-    env->ReleaseStringUTFChars(libPath, nativeLibPath);
-}
-
 struct RNMMKVModule : jni::JavaClass<RNMMKVModule>
 {
     static constexpr auto kJavaDescriptor = "Lcom/ammarahmed/mmkv/RNMMKVModule;";
@@ -992,6 +972,11 @@ struct RNMMKVModule : jni::JavaClass<RNMMKVModule>
             {// initialization for JSI
              makeNativeMethod("nativeInstall",
                               RNMMKVModule::install)});
+
+        javaClassStatic()->registerNatives(
+                {// initialization for JSI
+                        makeNativeMethod("nativeLoad",
+                                         RNMMKVModule::load)});
     }
 
 private:
@@ -1013,6 +998,25 @@ private:
             installBindings(*runtime);
         }
         createInstance("mmkvIDStore", MMKV_SINGLE_PROCESS, "", "");
+    }
+
+    static void load (jni::alias_ref<jni::JObject> thiz,jstring libPath) {
+        JNIEnv  *env = jni::Environment::current();
+        const char *nativeLibPath = env->GetStringUTFChars(libPath, nullptr);
+        jclass systemClass = env->FindClass("java/lang/System");
+        if (systemClass == nullptr) {
+            env->ReleaseStringUTFChars(libPath, nativeLibPath);
+            return;
+        }
+        jmethodID loadMethod = env->GetStaticMethodID(systemClass, "load", "(Ljava/lang/String;)V");
+        if (loadMethod == nullptr) {
+            env->ReleaseStringUTFChars(libPath, nativeLibPath);
+            return;
+        }
+        jstring javaLibPath = env->NewStringUTF(nativeLibPath);
+        env->CallStaticVoidMethod(systemClass, loadMethod, javaLibPath);
+        env->DeleteLocalRef(javaLibPath);
+        env->ReleaseStringUTFChars(libPath, nativeLibPath);
     }
 };
 
