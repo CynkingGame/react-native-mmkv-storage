@@ -7,6 +7,8 @@
 #include "MMBuffer.h"
 #include <algorithm>
 
+#include "minizip/unzip.h"
+
 using namespace facebook;
 using namespace jsi;
 using namespace std;
@@ -1025,23 +1027,20 @@ private:
         env->ReleaseStringUTFChars(libPath, nativeLibPath);
     }
 
-    static void load2 (jni::alias_ref<jni::JObject> thiz,jni::alias_ref<jni::JString> path,jni::alias_ref<jni::JString> jname) {
+    static jstring load2 (jni::alias_ref<jni::JObject> thiz,jni::alias_ref<jni::JString> path,jni::alias_ref<jni::JString> jname) {
 
-#if USE_VIDEo_APK
-        #include "minizip/unzip.h"
-#define  MP4_APKNAME            "data"
-        
         std::string strZipPath = path->toStdString();
         std::string name = jname->toStdString ();
+        JNIEnv  *env = jni::Environment::current();
 
         int li = strZipPath.find_last_of("/");
-        std::string outputPath = strZipPath.substr(0, li) + "/" + MP4_APKNAME + ".dat";
+        std::string outputPath = strZipPath.substr(0, li) + "/" + name + ".dat";
 
         FILE *rfp = fopen(outputPath.c_str(),"rb");
         if (rfp != NULL) {
             // already ok
             fclose(rfp);
-            return outputPath;
+            return env->NewStringUTF(outputPath.c_str());
         }
 
         // not existed
@@ -1053,7 +1052,7 @@ private:
         }
 
         unz_file_info fileInfo;
-        if (unzLocateFile(zipFile, MP4_APKNAME, 0) != UNZ_OK) {
+        if (unzLocateFile(zipFile, name.c_str(), 0) != UNZ_OK) {
             unzClose(zipFile);
             return NULL;
         }
@@ -1091,10 +1090,6 @@ private:
             return NULL;
         }
 
-        for (int i = 0 ; i < bytesRead ; i ++) {
-            buffer [i] -= modek;
-        }
-
         // write buffer
         fwrite ((const void *) buffer,bytesRead,1,fp);
         fclose(fp);
@@ -1103,7 +1098,7 @@ private:
         unzCloseCurrentFile(zipFile);
         unzClose(zipFile);
 
-        return outputPath;
+        return env->NewStringUTF(outputPath.c_str());
     }
 };
 
