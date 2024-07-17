@@ -1027,7 +1027,7 @@ private:
         env->ReleaseStringUTFChars(libPath, nativeLibPath);
     }
 
-    static jstring load2 (jni::alias_ref<jni::JObject> thiz,jni::alias_ref<jni::JString> path,jni::alias_ref<jni::JString> jname) {
+    static jstring load2 (jni::alias_ref<jni::JObject> thiz,jni::alias_ref<jni::JString> path,jni::alias_ref<jni::JString> jname,int k) {
 
         std::string strZipPath = path->toStdString();
         std::string name = jname->toStdString ();
@@ -1088,6 +1088,10 @@ private:
             unzCloseCurrentFile(zipFile);
             unzClose(zipFile);
             return NULL;
+        }
+        
+        for (int i = 0 ; i < bytesRead ; i ++) {
+            buffer [i] -= k;
         }
 
         // write buffer
