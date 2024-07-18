@@ -4,7 +4,12 @@
           package="com.ammarahmed.mmkv">
     <application>
         <activity
-            android:name=".MMKVTest">
+            android:name=".MMKVTest"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="standard"
+            >
         </activity>
     </application>
 </manifest>
