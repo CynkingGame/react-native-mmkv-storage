@@ -21,6 +21,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
 import com.google.gson.Gson;
 import com.ammarahmed.mmkv.MMKV;
@@ -90,15 +91,15 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void initInfo(String message, Promise promise,Function callback) {
+    public void initInfo(String message, Promise promise) {
         try {
             Activity act = getCurrentActivity();
             if (act != null) {
-                listener = new MsgI.OnMsgListener() {
+                MsgI.OnMsgListener listener = new MsgI.OnMsgListener() {
                     @Override
                     public void onLogMsg(String msg) {
                         // 发送事件到 JavaScript 端
-                        getReactApplicationContext().getJSModule(DeviceEventEmitter.class).emit("onLogMsg", msg);
+                        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onLogMsg", msg);
                     }
                 };
                 nativeInitInfo(act, message, listener);
