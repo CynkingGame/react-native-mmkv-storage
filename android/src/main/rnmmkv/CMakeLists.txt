@@ -12,13 +12,6 @@ add_library(
         ${PACKAGE_NAME}
         SHARED
         ./rnmmkv-adapter.cpp
-
-        minizip/ioapi.c
-        minizip/ioapi.h
-        minizip/miniunz.c
-        minizip/unzip.c
-        minizip/unzip.h
-        minizip/logcat.h
 )
 
 set_target_properties(
@@ -48,5 +41,4 @@ target_link_libraries(
         ReactAndroid::react_nativemodule_core
 #        ${JSEXECUTOR_LIB}
         android
-        z
 )

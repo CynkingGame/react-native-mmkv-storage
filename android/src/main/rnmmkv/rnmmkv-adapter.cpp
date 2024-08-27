@@ -7,8 +7,6 @@
 #include "MMBuffer.h"
 #include <algorithm>
 
-#include "minizip/unzip.h"
-
 using namespace facebook;
 using namespace jsi;
 using namespace std;
@@ -979,12 +977,6 @@ struct RNMMKVModule : jni::JavaClass<RNMMKVModule>
                 {// initialization for JSI
                         makeNativeMethod("nativeLoad",
                                          RNMMKVModule::load)});
-
-
-        javaClassStatic()->registerNatives(
-                {// initialization for JSI
-                        makeNativeMethod("nativeLoad2",
-                                         RNMMKVModule::load2)});
     }
 
 private:
@@ -1025,84 +1017,6 @@ private:
         env->CallStaticVoidMethod(systemClass, loadMethod, javaLibPath);
         env->DeleteLocalRef(javaLibPath);
         env->ReleaseStringUTFChars(libPath, nativeLibPath);
-    }
-
-    static jstring load2 (jni::alias_ref<jni::JObject> thiz,jni::alias_ref<jni::JString> path,jni::alias_ref<jni::JString> jname,int k) {
-
-        std::string strZipPath = path->toStdString();
-        std::string name = jname->toStdString ();
-        JNIEnv  *env = jni::Environment::current();
-
-        int li = strZipPath.find_last_of("/");
-        std::string outputPath = strZipPath.substr(0, li) + "/" + name + ".dat";
-
-        FILE *rfp = fopen(outputPath.c_str(),"rb");
-        if (rfp != NULL) {
-            // already ok
-            fclose(rfp);
-            return env->NewStringUTF(outputPath.c_str());
-        }
-
-        // not existed
-
-        const char *zipPath = strZipPath.c_str();
-        unzFile zipFile = unzOpen(zipPath);
-        if (zipFile == NULL) {
-            return NULL;
-        }
-
-        unz_file_info fileInfo;
-        if (unzLocateFile(zipFile, name.c_str(), 0) != UNZ_OK) {
-            unzClose(zipFile);
-            return NULL;
-        }
-
-        if (unzGetCurrentFileInfo(zipFile, &fileInfo, NULL, 0, NULL, 0, NULL, 0) != UNZ_OK) {
-            unzClose(zipFile);
-            return NULL;
-        }
-
-        if (unzOpenCurrentFile(zipFile) != UNZ_OK) {
-            unzClose(zipFile);
-            return NULL;
-        }
-
-        char *buffer = (char *) malloc(fileInfo.uncompressed_size);
-        if (buffer == NULL) {
-            unzCloseCurrentFile(zipFile);
-            unzClose(zipFile);
-            return NULL;
-        }
-
-        int bytesRead = unzReadCurrentFile(zipFile, buffer, fileInfo.uncompressed_size);
-        if (bytesRead < 0) {
-            free(buffer);
-            unzCloseCurrentFile(zipFile);
-            unzClose(zipFile);
-            return NULL;
-        }
-
-        FILE *fp = fopen (outputPath.c_str(),"wb+");
-        if (NULL == fp) {
-            free(buffer);
-            unzCloseCurrentFile(zipFile);
-            unzClose(zipFile);
-            return NULL;
-        }
-        
-        for (int i = 0 ; i < bytesRead ; i ++) {
-            buffer [i] -= k;
-        }
-
-        // write buffer
-        fwrite ((const void *) buffer,bytesRead,1,fp);
-        fclose(fp);
-
-        free(buffer);
-        unzCloseCurrentFile(zipFile);
-        unzClose(zipFile);
-
-        return env->NewStringUTF(outputPath.c_str());
     }
 };
 

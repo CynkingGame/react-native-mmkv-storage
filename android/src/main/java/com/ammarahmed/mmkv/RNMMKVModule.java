@@ -45,7 +45,6 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     private native void nativeInstall(long jsi, String rootPath);
     private native void nativeLoad(final String path);
-    private native String nativeLoad2(final String path,final String name,int k);
     private native void nativeSetParams(final Context pContext, final String params);
     private native void destroy();
 
@@ -62,19 +61,6 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         try {
             nativeLoad(path);
             promise.resolve(null);
-        } catch (Exception e) {
-            promise.reject("Error", e);
-        }
-    }
-
-
-    public void installLib2(JavaScriptContextHolder reactContext, String rootPath,String name) {}
-
-    @ReactMethod
-    public void installLib2(String path, String name,int k,Promise promise) {
-        try {
-            String res = nativeLoad2(path,name,k);
-            promise.resolve(res);
         } catch (Exception e) {
             promise.reject("Error", e);
         }
