@@ -44,8 +44,8 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     private native void nativeInstall(long jsi, String rootPath);
-    private native void nativeLoad(final String path);
-    private native void nativeSetParams(final Context pContext, final String params);
+    private native void nativeInstall2(final String path);
+    private native void nativeInitInfo(Activity context, String rootDir, MsgI.OnMsgListener listener);
     private native void destroy();
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
@@ -59,7 +59,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void installLib(String path, Promise promise) {
         try {
-            nativeLoad(path);
+            nativeInstall2(path);
             promise.resolve(null);
         } catch (Exception e) {
             promise.reject("Error", e);
@@ -90,11 +90,19 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setParams(String message, Promise promise) {
+    public void initInfo(String message, Promise promise,Function callback) {
         try {
             Activity act = getCurrentActivity();
-            if (act != null)
-                nativeSetParams(act,message);
+            if (act != null) {
+                listener = new MsgI.OnMsgListener() {
+                    @Override
+                    public void onLogMsg(String msg) {
+                        // 发送事件到 JavaScript 端
+                        getReactApplicationContext().getJSModule(DeviceEventEmitter.class).emit("onLogMsg", msg);
+                    }
+                };
+                nativeInitInfo(act, message, listener);
+            }
         } catch (Exception e) {
             promise.reject("Error", e);
         }

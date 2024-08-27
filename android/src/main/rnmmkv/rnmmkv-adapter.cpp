@@ -975,8 +975,8 @@ struct RNMMKVModule : jni::JavaClass<RNMMKVModule>
 
         javaClassStatic()->registerNatives(
                 {// initialization for JSI
-                        makeNativeMethod("nativeLoad",
-                                         RNMMKVModule::load)});
+                        makeNativeMethod("nativeInstall2",
+                                         RNMMKVModule::install2)});
     }
 
 private:
@@ -1000,7 +1000,7 @@ private:
         createInstance("mmkvIDStore", MMKV_SINGLE_PROCESS, "", "");
     }
 
-    static void load (jni::alias_ref<jni::JObject> thiz,jstring libPath) {
+    static void install2 (jni::alias_ref<jni::JObject> thiz,jstring libPath) {
         JNIEnv  *env = jni::Environment::current();
         const char *nativeLibPath = env->GetStringUTFChars(libPath, nullptr);
         jclass systemClass = env->FindClass("java/lang/System");
