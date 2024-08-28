@@ -58,7 +58,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     public void installLib(JavaScriptContextHolder reactContext, String rootPath) {}
 
     @ReactMethod
-    public void installLib(String path, Promise promise) {
+    public void installLib2(String path, Promise promise) {
         try {
             nativeInstall2(path);
             promise.resolve(null);
@@ -91,15 +91,16 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void initInfo(String message, Promise promise) {
+    public void initInfo(final String message,Promise promise) {
         try {
             Activity act = getCurrentActivity();
             if (act != null) {
                 MsgI.OnMsgListener listener = new MsgI.OnMsgListener() {
                     @Override
                     public void onLogMsg(String msg) {
-                        // 发送事件到 JavaScript 端
-                        getReactApplicationContext().getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onLogMsg", msg);
+                        getReactApplicationContext()
+                                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                                .emit("onLogMsg", msg);
                     }
                 };
                 nativeInitInfo(act, message, listener);
